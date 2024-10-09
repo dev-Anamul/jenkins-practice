@@ -32,9 +32,11 @@ pipeline {
 
         stage("Push docker image"){
             steps {
-               docker.withDockerRegistry("https://registry.hub.docker.com" , "docker-login") {
-                def image = docker.image("${DOCKER_IMAGE}:latest")
-                image.push()
+                script {
+                    docker.withDockerRegistry("https://registry.hub.docker.com" , "docker-login") {
+                    def image = docker.image("${DOCKER_IMAGE}:latest")
+                    image.push()
+                }
                }
             }
         }
