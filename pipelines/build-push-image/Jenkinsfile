@@ -23,7 +23,7 @@ pipeline {
         stage("Login to docker hub"){
             steps {
                 script {
-                    docker.withDockerRegistry("https://registry.hub.docker.com" , "docker-login") {
+                    docker.withDockerRegistry("https://hub.docker.com" , "docker-login") {
                         echo "Login to docker hub"
                     }
                 }
@@ -33,7 +33,7 @@ pipeline {
         stage("Push docker image"){
             steps {
                 script {
-                    docker.withDockerRegistry("https://registry.hub.docker.com" , "docker-login") {
+                    docker.withDockerRegistry("https://hub.docker.com" , "docker-login") {
                     def image = docker.image("${DOCKER_IMAGE}:latest")
                     image.push()
                 }
