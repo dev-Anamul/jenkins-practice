@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage("Clone Repository"){
             steps {
-                git "https://github.com/dev-Anamul/allumni.git"
+                git "https://github.com/dev-Anamul/allumni.git", branch: 'main'
             }
         }
 
