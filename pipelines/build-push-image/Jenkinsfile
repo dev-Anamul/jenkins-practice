@@ -6,13 +6,13 @@ pipeline {
     }
 
     stages {
-        stage("Clone repository"){
+        stage("Clone repository") {
             steps {
                 git url: "https://github.com/dev-Anamul/allumni.git", branch: 'main'
             }
         }
 
-        stage("Build docker image"){
+        stage("Build docker image") {
             steps {
                 script {
                     docker.build("${DOCKER_IMAGE}:latest")
@@ -20,36 +20,34 @@ pipeline {
             }
         }
 
-        stage("Login to docker hub"){
+        stage("Login to Docker Hub") {
             steps {
                 script {
-                    docker.withDockerRegistry("https://hub.docker.com" , "docker-login") {
-                        echo "Login to docker hub"
+                    // Using withCredentials for better security
+                    withCredentials([usernamePassword(credentialsId: 'docker-login', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                        sh "echo ${DOCKER_PASSWORD} | docker login -u ${DOCKER_USERNAME} --password-stdin"
+                        echo "Logged in to Docker Hub"
                     }
                 }
             }
         }
 
-        stage("Push docker image"){
+        stage("Push docker image") {
             steps {
                 script {
-                    docker.withDockerRegistry("https://hub.docker.com" , "docker-login") {
                     def image = docker.image("${DOCKER_IMAGE}:latest")
-                    image.push()
+                    image.push() // Push the image to Docker Hub
                 }
-               }
             }
         }
-
     }
 
-    post{
+    post {
         success {
-            echo "Docker image built and push to docker hub successfully"
+            echo "Docker image built and pushed to Docker Hub successfully"
         }
         failure {
             echo "Failed to build or push docker image"
         }
     }
-
 }
