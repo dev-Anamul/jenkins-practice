@@ -23,7 +23,6 @@ pipeline {
         stage("Login to Docker Hub") {
             steps {
                 script {
-                    // Using withCredentials for better security
                     withCredentials([usernamePassword(credentialsId: 'docker-login', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                         sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
                         echo "Logged in to Docker Hub"
@@ -36,7 +35,7 @@ pipeline {
             steps {
                 script {
                     def image = docker.image("${DOCKER_IMAGE}:latest")
-                    image.push() // Push the image to Docker Hub
+                    image.push()
                 }
             }
         }
