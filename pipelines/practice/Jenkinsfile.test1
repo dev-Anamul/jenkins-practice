@@ -1,9 +1,5 @@
 pipeline {
-    agent {
-        docker {
-            image 'node:20-alpine'
-        }
-    }
+    agent any
 
     environment {
         DOCKER_IMAGE = '01791689522/first-jenkins:1.0.0'
