@@ -22,6 +22,12 @@ pipeline {
             }
         }
 
+        stage('install dependencies') {
+            steps {
+                sh 'cd one-jen && yarn install' 
+            }
+        }
+
         stage('Run Tests') {
             steps {
                 sh 'cd one-jen && yarn test' 
