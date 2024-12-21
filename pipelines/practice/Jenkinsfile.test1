@@ -12,16 +12,6 @@ pipeline {
             }
         }
 
-        stage('List Directory Contents') {
-            steps {
-                sh '''
-                cd one-jen
-                pwd
-                ls -la
-                '''
-            }
-        }
-
         stage('Test the Code') {
             agent {
                 docker {
@@ -37,6 +27,7 @@ pipeline {
                 yarn format
                 yarn build
                 '''
+                stash includes: 'one-jen/**', name: 'project-files' // Stash entire directory
             }
         }
 
@@ -45,7 +36,7 @@ pipeline {
                 script {
                     withCredentials([
                         usernamePassword(
-                            credentialsId: 'docker-login', 
+                            credentialsId: 'docker-login',
                             usernameVariable: 'DOCKER_USERNAME',
                             passwordVariable: 'DOCKER_PASSWORD'
                         )
@@ -59,8 +50,9 @@ pipeline {
 
         stage('Build & Push Docker Image') {
             steps {
+                unstash 'project-files' 
                 script {
-                    def image = docker.build("${DOCKER_IMAGE}") 
+                    def image = docker.build("${DOCKER_IMAGE}", "one-jen") 
                     image.push()
                 }
             }
@@ -68,12 +60,6 @@ pipeline {
     }
 
     post {
-        success {
-            echo 'Pipeline completed successfully!'
-        }
-        failure {
-            echo 'Pipeline failed. Check the logs.'
-        }
         always {
             echo 'Pipeline execution finished.'
         }
