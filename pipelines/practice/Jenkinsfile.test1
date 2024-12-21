@@ -6,29 +6,37 @@ pipeline {
     }
 
     stages {
-        stage('clone repository') {
+        stage('Clone Repository') {
             steps {
-                git url: "https://github.com/dev-Anamul/jenkins-practice.git", branch: 'master'
+                git url: 'https://github.com/dev-Anamul/jenkins-practice.git', branch: 'master'
             }
         }
 
         stage('List Directory Contents') {
             steps {
-                sh 'cd one-jen && pwd && ls -la' 
+                sh '''
+                cd one-jen
+                pwd
+                ls -la
+                '''
             }
         }
 
-        stage('test the code') {
-            agent docker {
-                image 'node:20-alpine'
+        stage('Test the Code') {
+            agent {
+                docker {
+                    image 'node:20-alpine'
+                }
             }
-
             steps {
-                sh 'cd one-jen && yarn install'
-                sh 'cd one-jen && yarn test'
-                sh 'cd one-jen && yarn lint'
-                sh 'cd one-jen && yarn format'
-                sh 'cd one-jen && yarn build'
+                sh '''
+                cd one-jen
+                yarn install
+                yarn test
+                yarn lint
+                yarn format
+                yarn build
+                '''
             }
         }
 
@@ -37,7 +45,7 @@ pipeline {
                 script {
                     withCredentials([
                         usernamePassword(
-                            credentialsId: 'docker-login',
+                            credentialsId: 'docker-login', 
                             usernameVariable: 'DOCKER_USERNAME',
                             passwordVariable: 'DOCKER_PASSWORD'
                         )
@@ -49,20 +57,25 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Build & Push Docker Image') {
             steps {
                 script {
                     def image = docker.build("${DOCKER_IMAGE}") 
-                    image.push() 
+                    image.push()
                 }
             }
         }
-        
     }
 
     post {
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed. Check the logs.'
+        }
         always {
-            echo 'Pipeline completed'
+            echo 'Pipeline execution finished.'
         }
     }
 }
