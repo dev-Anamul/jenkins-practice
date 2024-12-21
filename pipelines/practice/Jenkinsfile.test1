@@ -1,3 +1,4 @@
+
 pipeline {
     agent {
         docker {
@@ -6,29 +7,37 @@ pipeline {
     }
 
     environment {
-        DOCKER_IMAGE = "01791689522/first-jenkins:1.0.0"
+        DOCKER_IMAGE = '01791689522/first-jenkins:1.0.0'
     }
 
     stages {
-        stage("Checkout") {
+        stage('Checkout') {
             steps {
-                git url: 'https://github.com/dev-Anamul/jenkins-practice.git', branch: 'main' 
+                script {
+                    checkout([
+                        $class: 'GitSCM',
+                        branches: [[name: 'master']],
+                        userRemoteConfigs: [[
+                            url: 'https://github.com/dev-Anamul/jenkins-practice.git'
+                        ]]
+                    ])
+                }
             }
         }
 
-        stage("go to the directory") {
+        stage('go to the directory') {
             steps {
                 sh 'cd one-jen && pwd && ls -la'
             }
         }
 
-        stage("Run the test") {
+        stage('Run the test') {
             steps {
                 sh 'yarn test'
             }
         }
 
-        stage("build the docker image") {
+        stage('build the docker image') {
             steps {
                 script {
                     docker.build("${DOCKER_IMAGE}")
@@ -36,25 +45,30 @@ pipeline {
             }
         }
 
-        stage("login to docker hub") {
+        stage('login to docker hub') {
             steps {
                 script {
-                    withCredentials([usernamePassword(credentialsId: 'docker-login', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    withCredentials([
+                        usernamePassword(
+                            credentialsId: 'docker-login',
+                            usernameVariable: 'DOCKER_USERNAME',
+                            passwordVariable: 'DOCKER_PASSWORD'
+                        )
+                    ]) {
                         sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
-                        echo "Logged in to Docker Hub"
+                        echo 'Logged in to Docker Hub'
                     }
                 }
             }
         }
 
-        stage("push the docker image") {
+        stage('push the docker image') {
             steps {
                 script {
                     docker.push("${DOCKER_IMAGE}")
                 }
             }
         }
-
     }
 
     post {
