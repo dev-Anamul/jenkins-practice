@@ -1,0 +1,52 @@
+pipeline {
+    agent any 
+
+    environment {
+        DOCKER_IMAGE = "01791689522/test_jenkins"
+    }
+
+    stages {
+        stage("Clone repository") {
+            steps {
+                git url: "https://github.com/dev-Anamul/allumni.git", branch: 'main'
+            }
+        }
+
+        stage("Build docker image") {
+            steps {
+                script {
+                    docker.build("${DOCKER_IMAGE}:latest")
+                }
+            }
+        }
+
+        stage("Login to Docker Hub") {
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'docker-login', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                        sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
+                        echo "Logged in to Docker Hub"
+                    }
+                }
+            }
+        }
+
+        stage("Push docker image") {
+            steps {
+                script {
+                    def image = docker.image("${DOCKER_IMAGE}:latest")
+                    image.push()
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "Docker image built and pushed to Docker Hub successfully"
+        }
+        failure {
+            echo "Failed to build or push docker image"
+        }
+    }
+}

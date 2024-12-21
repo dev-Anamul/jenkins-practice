@@ -1,0 +1,64 @@
+pipeline {
+    agent docker {
+        image 'ubuntu:22.04'
+    }
+
+    environment {
+        DOCKER_IMAGE = "01791689522/first-jenkins:1.0.0"
+    }
+
+    stages {
+        stage("Checkout") {
+            steps {
+                git url: 'https://github.com/dev-Anamul/jenkins-practice.git', branch: 'main' 
+            }
+        }
+
+        stage("go to the directory") {
+            steps {
+                sh 'cd one-jen && pwd && ls -la'
+            }
+        }
+
+        stage("Run the test") {
+            steps {
+                sh 'yarn test'
+            }
+        }
+
+        stage("build the docker image") {
+            steps {
+                script {
+                    docker.build("${DOCKER_IMAGE}")
+                }
+            }
+        }
+
+        stage("login to docker hub") {
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'docker-login', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                        sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
+                        echo "Logged in to Docker Hub"
+                    }
+                }
+            }
+        }
+
+        stage("push the docker image") {
+            steps {
+                script {
+                    docker.push("${DOCKER_IMAGE}")
+                }
+            }
+        }
+
+    }
+
+    post {
+        always {
+            echo 'Pipeline completed'
+        }
+    }
+}
+

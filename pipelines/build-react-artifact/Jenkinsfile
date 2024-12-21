@@ -1,0 +1,44 @@
+pipeline {
+    agent {
+        docker {
+            image 'node:20-alpine'
+        }
+    }
+
+    stages {
+        stage("Clone Repository"){
+            steps {
+                git url: "https://github.com/dev-Anamul/allumni.git", branch: 'main'
+            }
+        }
+
+        stage("Install dependencies") {
+            steps {
+                sh "yarn install"
+            }
+        }
+
+        stage("build"){
+            steps {
+                sh "yarn build"
+            }
+        }
+
+        stage("Archive artifacts"){
+            steps {
+                archiveArtifacts artifacts: 'build/**', allowEmptyArchive: false
+            }
+        }
+    }
+
+    post{
+        success {
+            echo "Build completed successfully"
+        }
+        
+        failure {
+            echo "Build failed"
+        }
+    }
+
+}
