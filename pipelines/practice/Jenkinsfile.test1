@@ -12,12 +12,6 @@ pipeline {
             }
         }
 
-        stage('install yarn') {
-            steps {
-                sh 'cd one-jen && npm install -g yarn' 
-            }
-        }
-
         stage('List Directory Contents') {
             steps {
                 sh 'cd one-jen && pwd && ls -la' 
