@@ -6,35 +6,27 @@ pipeline {
     }
 
     stages {
-        stage('Checkout') {
+        stage('clone repository') {
             steps {
-                script {
-                    checkout([
-                        $class: 'GitSCM',
-                        branches: [[name: 'master']],
-                        userRemoteConfigs: [[
-                            url: 'https://github.com/dev-Anamul/jenkins-practice.git'
-                        ]]
-                    ])
-                }
+                git url: "https://github.com/dev-Anamul/jenkins-practice.git", branch: 'master'
             }
         }
 
-        stage('Prepare Environment') {
+        stage('install yarn') {
             steps {
-                sh 'npm install -g yarn' // Install Yarn
+                sh 'cd one-jen && npm install -g yarn' 
             }
         }
 
         stage('List Directory Contents') {
             steps {
-                sh 'cd one-jen && pwd && ls -la' // Navigate and list directory
+                sh 'cd one-jen && pwd && ls -la' 
             }
         }
 
         stage('Run Tests') {
             steps {
-                sh 'cd one-jen && yarn test' // Ensure the correct directory
+                sh 'cd one-jen && yarn test' 
             }
         }
 
