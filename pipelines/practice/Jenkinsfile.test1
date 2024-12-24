@@ -27,7 +27,7 @@ pipeline {
                 yarn format
                 yarn build
                 '''
-                stash includes: 'one-jen/**', name: 'project-files' // Stash entire directory
+                stash includes: 'one-jen/**', name: 'project-files'
             }
         }
 
@@ -60,6 +60,13 @@ pipeline {
     }
 
     post {
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed. Check the logs.'
+        }
+
         always {
             echo 'Pipeline execution finished.'
         }
