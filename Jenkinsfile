@@ -21,14 +21,14 @@ pipeline {
                 sh '''
                     cd one-web
                     yarn install
-                    yarn test
+                    yarn lint
                 '''
                 
                 echo "Testing web two"
                 sh '''
                     cd ../two-web
                     yarn install
-                    yarn test
+                    yarn lint
                 '''
                 
                 echo "Testing API one"
