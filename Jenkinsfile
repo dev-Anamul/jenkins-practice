@@ -33,14 +33,14 @@ pipeline {
                 
                 echo "Testing API one"
                 sh '''
-                    cd ../one-api
+                    cd one-api
                     yarn install
                     yarn test
                 '''
                 
                 echo "Testing API two"
                 sh '''
-                    cd ../two-api
+                    cd two-api
                     yarn install
                     yarn test
                 '''
@@ -73,21 +73,21 @@ pipeline {
                 
                 echo "Building web two"
                 sh '''
-                    cd ../two-web
+                    cd two-web
                     yarn install
                     yarn build
                 '''
                 
                 echo "Building API one"
                 sh '''
-                    cd ../one-api
+                    cd one-api
                     yarn install
                     yarn build
                 '''
                 
                 echo "Building API two"
                 sh '''
-                    cd ../two-api
+                    cd two-api
                     yarn install
                     yarn build
                 '''
