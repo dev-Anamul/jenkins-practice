@@ -26,7 +26,7 @@ pipeline {
                 
                 echo "Testing web two"
                 sh '''
-                    cd ../two-web
+                    cd two-web
                     yarn install
                     yarn lint
                 '''
